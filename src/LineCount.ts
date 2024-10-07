@@ -1,11 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
+import DirectoryTemplate from "./DirectoryTemplate";
 
-class LineCount {
-  private dirName: string;
-  private fileRegExp: RegExp;
-  private recurse: boolean;
-
+class LineCount extends DirectoryTemplate {
   private totalLineCount: number = 0;
 
   public static main(): void {
@@ -16,21 +13,15 @@ class LineCount {
     } else if (process.argv.length === 5 && process.argv[2].match("-r")) {
       lineCount = new LineCount(process.argv[3], process.argv[4], true);
     } else {
-      this.usage();
+      this.usage(this.name, "<dir> <file-pattern>");
       return;
     }
 
     lineCount.run();
   }
 
-  private static usage(): void {
-    console.log("USAGE: npx ts-node src/LineCount.ts {-r} <dir> <file-pattern>");
-  }
-
   private constructor(dirName: string, filePattern: string, recurse: boolean = false) {
-    this.dirName = dirName;
-    this.fileRegExp = new RegExp(filePattern);
-    this.recurse = recurse;
+    super(dirName, filePattern, recurse);
   }
 
   private async run() {
@@ -81,31 +72,6 @@ class LineCount {
       } finally {
         console.log(`${currentLineCount} ${filePath}`);
       }
-    }
-  }
-
-  private isDirectory(path: string): boolean {
-    try {
-      return fs.statSync(path).isDirectory();
-    } catch (error) {
-      return false;
-    }
-  }
-
-  private isFile(path: string): boolean {
-    try {
-      return fs.statSync(path).isFile();
-    } catch (error) {
-      return false;
-    }
-  }
-
-  private isReadable(path: string): boolean {
-    try {
-      fs.accessSync(path, fs.constants.R_OK);
-      return true;
-    } catch (error) {
-      return false;
     }
   }
 }

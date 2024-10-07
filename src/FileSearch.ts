@@ -1,12 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
+import DirectoryTemplate from "./DirectoryTemplate";
 
-class FileSearch {
-  private dirName: string;
-  private fileRegExp: RegExp;
+class FileSearch extends DirectoryTemplate {
   private searchRegExp: RegExp;
-  private recurse: boolean;
-
   private totalMatches: number = 0;
 
   public static main(): void {
@@ -17,15 +14,11 @@ class FileSearch {
     } else if (process.argv.length === 6 && process.argv[2].match("-r")) {
       fileSearch = new FileSearch(process.argv[3], process.argv[4], process.argv[5], true);
     } else {
-      this.usage();
+      this.usage(this.name, "<dir> <file-pattern> <search-pattern>");
       return;
     }
 
     fileSearch.run();
-  }
-
-  private static usage(): void {
-    console.log("USAGE: npx ts-node src/FileSearch.ts {-r} <dir> <file-pattern> <search-pattern>");
   }
 
   private constructor(
@@ -34,10 +27,8 @@ class FileSearch {
     searchPattern: string,
     recurse: boolean = false
   ) {
-    this.dirName = dirName;
-    this.fileRegExp = new RegExp(filePattern);
+    super(dirName, filePattern, recurse);
     this.searchRegExp = new RegExp(searchPattern);
-    this.recurse = recurse;
   }
 
   private async run() {
@@ -106,31 +97,6 @@ class FileSearch {
           console.log(`MATCHES: ${currentMatchCount}`);
         }
       }
-    }
-  }
-
-  private isDirectory(path: string): boolean {
-    try {
-      return fs.statSync(path).isDirectory();
-    } catch (error) {
-      return false;
-    }
-  }
-
-  private isFile(path: string): boolean {
-    try {
-      return fs.statSync(path).isFile();
-    } catch (error) {
-      return false;
-    }
-  }
-
-  private isReadable(path: string): boolean {
-    try {
-      fs.accessSync(path, fs.constants.R_OK);
-      return true;
-    } catch (error) {
-      return false;
     }
   }
 
