@@ -1,0 +1,51 @@
+# Ignore node_modules (if using Node.js)
+node_modules/
+
+# Ignore log files
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore environment variable files (if used)
+.env
+.env.local
+.env.*.local
+
+# Ignore production build files
+dist/
+build/
+
+# Ignore editor-specific settings (for Visual Studio Code)
+.vscode/
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/*.code-workspace
+
+# Ignore coverage reports
+coverage/
+*.lcov
+
+# Ignore lock files (if using npm/yarn/pnpm)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Ignore testing snapshots (if applicable)
+__snapshots__/
+
+# Ignore compiled code (if applicable)
+*.out
+*.o
+*.pyc
+*.class
+*.exe
+
+# Ignore misc
+*.log
+*.bak
+*.tmp
