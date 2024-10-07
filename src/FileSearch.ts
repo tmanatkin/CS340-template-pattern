@@ -13,18 +13,9 @@ class FileSearch {
     let fileSearch: FileSearch;
 
     if (process.argv.length === 5) {
-      fileSearch = new FileSearch(
-        process.argv[2],
-        process.argv[3],
-        process.argv[4]
-      );
+      fileSearch = new FileSearch(process.argv[2], process.argv[3], process.argv[4]);
     } else if (process.argv.length === 6 && process.argv[2].match("-r")) {
-      fileSearch = new FileSearch(
-        process.argv[3],
-        process.argv[4],
-        process.argv[5],
-        true
-      );
+      fileSearch = new FileSearch(process.argv[3], process.argv[4], process.argv[5], true);
     } else {
       this.usage();
       return;
@@ -34,9 +25,7 @@ class FileSearch {
   }
 
   private static usage(): void {
-    console.log(
-      "USAGE: npx ts-node src/FileSearch.ts {-r} <dir> <file-pattern> <search-pattern>"
-    );
+    console.log("USAGE: npx ts-node src/FileSearch.ts {-r} <dir> <file-pattern> <search-pattern>");
   }
 
   private constructor(
@@ -96,10 +85,7 @@ class FileSearch {
 
     if (this.fileRegExp.test(filePath)) {
       try {
-        const fileContent: string = await fs.promises.readFile(
-          filePath,
-          "utf-8"
-        );
+        const fileContent: string = await fs.promises.readFile(filePath, "utf-8");
         const lines: string[] = fileContent.split(/\r?\n/);
 
         lines.forEach((line) => {

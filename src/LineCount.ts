@@ -24,16 +24,10 @@ class LineCount {
   }
 
   private static usage(): void {
-    console.log(
-      "USAGE: npx ts-node src/LineCount.ts {-r} <dir> <file-pattern>"
-    );
+    console.log("USAGE: npx ts-node src/LineCount.ts {-r} <dir> <file-pattern>");
   }
 
-  private constructor(
-    dirName: string,
-    filePattern: string,
-    recurse: boolean = false
-  ) {
+  private constructor(dirName: string, filePattern: string, recurse: boolean = false) {
     this.dirName = dirName;
     this.fileRegExp = new RegExp(filePattern);
     this.recurse = recurse;
@@ -77,10 +71,7 @@ class LineCount {
       let currentLineCount = 0;
 
       try {
-        const fileContent: string = await fs.promises.readFile(
-          filePath,
-          "utf-8"
-        );
+        const fileContent: string = await fs.promises.readFile(filePath, "utf-8");
 
         const lines: string[] = fileContent.split(/\r?\n/);
         currentLineCount = lines.length;
