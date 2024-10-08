@@ -4,7 +4,7 @@ import DirectoryTemplate from "./DirectoryTemplate";
 
 class FileSearch extends DirectoryTemplate {
   private searchRegExp: RegExp;
-  private totalMatches: number = 0;
+  private totalCount: number = 0;
 
   public static main(): void {
     let fileSearch: FileSearch;
@@ -14,11 +14,15 @@ class FileSearch extends DirectoryTemplate {
     } else if (process.argv.length === 6 && process.argv[2].match("-r")) {
       fileSearch = new FileSearch(process.argv[3], process.argv[4], process.argv[5], true);
     } else {
-      this.usage(this.name, "<dir> <file-pattern> <search-pattern>");
+      this.usage();
       return;
     }
 
     fileSearch.run();
+  }
+
+  protected static usage(): void {
+    console.log(`USAGE: npx ts-node src/FileSearch.ts {-r} <dir> <file-pattern> <search-pattern>`);
   }
 
   private constructor(
@@ -33,11 +37,10 @@ class FileSearch extends DirectoryTemplate {
 
   private async run() {
     await this.searchDirectory(this.dirName);
-    console.log();
-    console.log(`TOTAL MATCHES: ${this.totalMatches}`);
+    console.log(`TOTAL: ${this.totalCount}`);
   }
 
-  private async searchDirectory(filePath: string) {
+  async searchDirectory(filePath: string) {
     if (!this.isDirectory(filePath)) {
       this.nonDirectory(filePath);
       return;
@@ -47,7 +50,6 @@ class FileSearch extends DirectoryTemplate {
       this.unreadableDirectory(filePath);
       return;
     }
-
     const files = fs.readdirSync(filePath);
 
     for (let file of files) {
@@ -87,7 +89,7 @@ class FileSearch extends DirectoryTemplate {
             }
 
             console.log(line);
-            this.totalMatches++;
+            this.totalCount++;
           }
         });
       } catch (error) {
@@ -98,18 +100,6 @@ class FileSearch extends DirectoryTemplate {
         }
       }
     }
-  }
-
-  private nonDirectory(dirName: string): void {
-    console.log(`${dirName} is not a directory`);
-  }
-
-  private unreadableDirectory(dirName: string): void {
-    console.log(`Directory ${dirName} is unreadable`);
-  }
-
-  private unreadableFile(fileName: string): void {
-    console.log(`File ${fileName} is unreadable`);
   }
 }
 

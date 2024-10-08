@@ -6,63 +6,85 @@ abstract class DirectoryTemplate {
   protected fileRegExp: RegExp;
   protected recurse: boolean;
 
+  // protected searchRegExp: RegExp;
+  // protected totalCount: number = 0;
+
   constructor(dirName: string, filePattern: string, recurse: boolean = false) {
     this.dirName = dirName;
     this.fileRegExp = new RegExp(filePattern);
     this.recurse = recurse;
   }
 
-  // main?
-
-  protected static usage(className: string, params: string): void {
-    console.log(`USAGE: npx ts-node src/${className}.ts {-r} ${params}`);
-  }
-
-  // dont use
-
-  // public async run(): Promise<void> {
-  //   await this.processDirectory(this.dirName);
-  //   this.displayResults();
+  // protected static usage(className: string, params: string): void {
+  //   console.log(`USAGE: npx ts-node src/${className}.ts {-r} ${params}`);
   // }
 
-  // private async processDirectory(dirPath: string) {
-  //   if (!this.isDirectory(dirPath)) {
-  //     console.log(`${dirPath} is not a directory`);
+  // protected async run() {
+  //   await this.searchDirectory(this.dirName);
+  //   console.log(`TOTAL: ${this.totalCount}`);
+  // }
+
+  // protected async searchDirectory(filePath: string) {
+  //   if (!this.isDirectory(filePath)) {
+  //     this.nonDirectory(filePath);
   //     return;
   //   }
 
-  //   if (!this.isReadable(dirPath)) {
-  //     console.log(`Directory ${dirPath} is unreadable`);
+  //   if (!this.isReadable(filePath)) {
+  //     this.unreadableDirectory(filePath);
   //     return;
   //   }
+  //   const files = fs.readdirSync(filePath);
 
-  //   const files = fs.readdirSync(dirPath);
-  //   for (const file of files) {
-  //     const fullPath = path.join(dirPath, file);
+  //   for (let file of files) {
+  //     const fullPath = path.join(filePath, file);
   //     if (this.isFile(fullPath)) {
   //       if (this.isReadable(fullPath)) {
-  //         await this.processFile(fullPath);
+  //         await this.searchFile(fullPath);
   //       } else {
-  //         console.log(`File ${fullPath} is unreadable`);
+  //         this.unreadableFile(fullPath);
   //       }
   //     }
   //   }
 
   //   if (this.recurse) {
-  //     for (const file of files) {
-  //       const fullPath = path.join(dirPath, file);
+  //     for (let file of files) {
+  //       const fullPath = path.join(filePath, file);
   //       if (this.isDirectory(fullPath)) {
-  //         await this.processDirectory(fullPath);
+  //         await this.searchDirectory(fullPath);
   //       }
   //     }
   //   }
   // }
 
-  // protected abstract processFile(filePath: string): Promise<void>;
+  // protected async searchFile(filePath: string) {
+  //   let currentMatchCount = 0;
 
-  // protected abstract displayResults(): void;
+  //   if (this.fileRegExp.test(filePath)) {
+  //     try {
+  //       const fileContent: string = await fs.promises.readFile(filePath, "utf-8");
+  //       const lines: string[] = fileContent.split(/\r?\n/);
 
-  // dont use
+  //       lines.forEach((line) => {
+  //         if (this.searchRegExp.test(line)) {
+  //           if (++currentMatchCount == 1) {
+  //             console.log();
+  //             console.log(`FILE: ${filePath}`);
+  //           }
+
+  //           console.log(line);
+  //           this.totalCount++;
+  //         }
+  //       });
+  //     } catch (error) {
+  //       this.unreadableFile(filePath);
+  //     } finally {
+  //       if (currentMatchCount > 0) {
+  //         console.log(`MATCHES: ${currentMatchCount}`);
+  //       }
+  //     }
+  //   }
+  // }
 
   protected isDirectory(path: string): boolean {
     try {
@@ -87,6 +109,18 @@ abstract class DirectoryTemplate {
     } catch (error) {
       return false;
     }
+  }
+
+  protected nonDirectory(dirName: string): void {
+    console.log(`${dirName} is not a directory`);
+  }
+
+  protected unreadableDirectory(dirName: string): void {
+    console.log(`Directory ${dirName} is unreadable`);
+  }
+
+  protected unreadableFile(fileName: string): void {
+    console.log(`File ${fileName} is unreadable`);
   }
 }
 
