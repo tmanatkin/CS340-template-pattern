@@ -6,8 +6,7 @@ abstract class DirectoryTemplate {
   protected fileRegExp: RegExp;
   protected recurse: boolean;
 
-  // protected searchRegExp: RegExp;
-  // protected totalCount: number = 0;
+  protected totalCount: number = 0;
 
   constructor(dirName: string, filePattern: string, recurse: boolean = false) {
     this.dirName = dirName;

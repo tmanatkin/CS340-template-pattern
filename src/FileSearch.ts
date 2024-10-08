@@ -3,8 +3,7 @@ import * as path from "path";
 import DirectoryTemplate from "./DirectoryTemplate";
 
 class FileSearch extends DirectoryTemplate {
-  private searchRegExp: RegExp;
-  private totalCount: number = 0;
+  protected searchRegExp: RegExp;
 
   public static main(): void {
     let fileSearch: FileSearch;
@@ -74,16 +73,15 @@ class FileSearch extends DirectoryTemplate {
   }
 
   private async searchFile(filePath: string) {
-    let currentMatchCount = 0;
+    let currentCount = 0;
 
     if (this.fileRegExp.test(filePath)) {
       try {
         const fileContent: string = await fs.promises.readFile(filePath, "utf-8");
         const lines: string[] = fileContent.split(/\r?\n/);
-
         lines.forEach((line) => {
           if (this.searchRegExp.test(line)) {
-            if (++currentMatchCount == 1) {
+            if (++currentCount == 1) {
               console.log();
               console.log(`FILE: ${filePath}`);
             }
@@ -95,9 +93,7 @@ class FileSearch extends DirectoryTemplate {
       } catch (error) {
         this.unreadableFile(filePath);
       } finally {
-        if (currentMatchCount > 0) {
-          console.log(`MATCHES: ${currentMatchCount}`);
-        }
+        console.log(`${currentCount} ${filePath}`);
       }
     }
   }

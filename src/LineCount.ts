@@ -3,8 +3,6 @@ import * as path from "path";
 import DirectoryTemplate from "./DirectoryTemplate";
 
 class LineCount extends DirectoryTemplate {
-  private totalCount: number = 0;
-
   public static main(): void {
     let lineCount: LineCount;
 
@@ -67,18 +65,18 @@ class LineCount extends DirectoryTemplate {
   }
 
   private async countLinesInFile(filePath: string) {
-    let currentLineCount = 0;
+    let currentCount = 0;
 
     if (this.fileRegExp.test(filePath)) {
       try {
         const fileContent: string = await fs.promises.readFile(filePath, "utf-8");
         const lines: string[] = fileContent.split(/\r?\n/);
-        currentLineCount = lines.length;
+        currentCount = lines.length;
         this.totalCount++;
       } catch (error) {
         this.unreadableFile(filePath);
       } finally {
-        console.log(`${currentLineCount} ${filePath}`);
+        console.log(`${currentCount} ${filePath}`);
       }
     }
   }
