@@ -6,84 +6,46 @@ abstract class DirectoryTemplate {
   protected fileRegExp: RegExp;
   protected recurse: boolean;
 
-  protected totalCount: number = 0;
-
   constructor(dirName: string, filePattern: string, recurse: boolean = false) {
     this.dirName = dirName;
     this.fileRegExp = new RegExp(filePattern);
     this.recurse = recurse;
   }
 
-  // protected static usage(className: string, params: string): void {
-  //   console.log(`USAGE: npx ts-node src/${className}.ts {-r} ${params}`);
-  // }
+  protected async searchDirectory(filePath: string) {
+    if (!this.isDirectory(filePath)) {
+      this.nonDirectory(filePath);
+      return;
+    }
 
-  // protected async run() {
-  //   await this.searchDirectory(this.dirName);
-  //   console.log(`TOTAL: ${this.totalCount}`);
-  // }
+    if (!this.isReadable(filePath)) {
+      this.unreadableDirectory(filePath);
+      return;
+    }
+    const files = fs.readdirSync(filePath);
 
-  // protected async searchDirectory(filePath: string) {
-  //   if (!this.isDirectory(filePath)) {
-  //     this.nonDirectory(filePath);
-  //     return;
-  //   }
+    for (let file of files) {
+      const fullPath = path.join(filePath, file);
+      if (this.isFile(fullPath)) {
+        if (this.isReadable(fullPath)) {
+          await this.searchFile(fullPath);
+        } else {
+          this.unreadableFile(fullPath);
+        }
+      }
+    }
 
-  //   if (!this.isReadable(filePath)) {
-  //     this.unreadableDirectory(filePath);
-  //     return;
-  //   }
-  //   const files = fs.readdirSync(filePath);
+    if (this.recurse) {
+      for (let file of files) {
+        const fullPath = path.join(filePath, file);
+        if (this.isDirectory(fullPath)) {
+          await this.searchDirectory(fullPath);
+        }
+      }
+    }
+  }
 
-  //   for (let file of files) {
-  //     const fullPath = path.join(filePath, file);
-  //     if (this.isFile(fullPath)) {
-  //       if (this.isReadable(fullPath)) {
-  //         await this.searchFile(fullPath);
-  //       } else {
-  //         this.unreadableFile(fullPath);
-  //       }
-  //     }
-  //   }
-
-  //   if (this.recurse) {
-  //     for (let file of files) {
-  //       const fullPath = path.join(filePath, file);
-  //       if (this.isDirectory(fullPath)) {
-  //         await this.searchDirectory(fullPath);
-  //       }
-  //     }
-  //   }
-  // }
-
-  // protected async searchFile(filePath: string) {
-  //   let currentMatchCount = 0;
-
-  //   if (this.fileRegExp.test(filePath)) {
-  //     try {
-  //       const fileContent: string = await fs.promises.readFile(filePath, "utf-8");
-  //       const lines: string[] = fileContent.split(/\r?\n/);
-
-  //       lines.forEach((line) => {
-  //         if (this.searchRegExp.test(line)) {
-  //           if (++currentMatchCount == 1) {
-  //             console.log();
-  //             console.log(`FILE: ${filePath}`);
-  //           }
-
-  //           console.log(line);
-  //           this.totalCount++;
-  //         }
-  //       });
-  //     } catch (error) {
-  //       this.unreadableFile(filePath);
-  //     } finally {
-  //       if (currentMatchCount > 0) {
-  //         console.log(`MATCHES: ${currentMatchCount}`);
-  //       }
-  //     }
-  //   }
-  // }
+  protected abstract searchFile(filePath: string): void;
 
   protected isDirectory(path: string): boolean {
     try {

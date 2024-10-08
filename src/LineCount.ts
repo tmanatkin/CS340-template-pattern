@@ -1,8 +1,10 @@
 import * as fs from "fs";
-import * as path from "path";
+// import * as path from "path";
 import DirectoryTemplate from "./DirectoryTemplate";
 
 class LineCount extends DirectoryTemplate {
+  private totalLineCount: number = 0;
+
   public static main(): void {
     let lineCount: LineCount;
 
@@ -18,7 +20,7 @@ class LineCount extends DirectoryTemplate {
     lineCount.run();
   }
 
-  protected static usage(): void {
+  private static usage(): void {
     console.log(`USAGE: npx ts-node src/LineCount.ts {-r} <dir> <file-pattern>`);
   }
 
@@ -27,56 +29,24 @@ class LineCount extends DirectoryTemplate {
   }
 
   private async run() {
-    await this.countLinesInDirectory(this.dirName);
-    console.log(`TOTAL: ${this.totalCount}`);
+    await this.searchDirectory(this.dirName);
+    console.log(`TOTAL: ${this.totalLineCount}`);
   }
 
-  private async countLinesInDirectory(filePath: string) {
-    if (!this.isDirectory(filePath)) {
-      this.nonDirectory(filePath);
-      return;
-    }
-
-    if (!this.isReadable(filePath)) {
-      this.unreadableDirectory(filePath);
-      return;
-    }
-    const files = fs.readdirSync(filePath);
-
-    for (let file of files) {
-      const fullPath = path.join(filePath, file);
-      if (this.isFile(fullPath)) {
-        if (this.isReadable(fullPath)) {
-          await this.countLinesInFile(fullPath);
-        } else {
-          this.unreadableFile(fullPath);
-        }
-      }
-    }
-
-    if (this.recurse) {
-      for (let file of files) {
-        const fullPath = path.join(filePath, file);
-        if (this.isDirectory(fullPath)) {
-          await this.countLinesInDirectory(fullPath);
-        }
-      }
-    }
-  }
-
-  private async countLinesInFile(filePath: string) {
-    let currentCount = 0;
-
+  override async searchFile(filePath: string) {
     if (this.fileRegExp.test(filePath)) {
+      let currentLineCount = 0;
+
       try {
         const fileContent: string = await fs.promises.readFile(filePath, "utf-8");
+
         const lines: string[] = fileContent.split(/\r?\n/);
-        currentCount = lines.length;
-        this.totalCount++;
+        currentLineCount = lines.length;
+        this.totalLineCount += currentLineCount;
       } catch (error) {
-        this.unreadableFile(filePath);
+        console.log(`File ${filePath} is unreadable`);
       } finally {
-        console.log(`${currentCount} ${filePath}`);
+        console.log(`${currentLineCount} ${filePath}`);
       }
     }
   }

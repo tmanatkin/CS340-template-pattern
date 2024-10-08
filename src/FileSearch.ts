@@ -1,9 +1,10 @@
 import * as fs from "fs";
-import * as path from "path";
+// import * as path from "path";
 import DirectoryTemplate from "./DirectoryTemplate";
 
 class FileSearch extends DirectoryTemplate {
-  protected searchRegExp: RegExp;
+  private searchRegExp: RegExp;
+  private totalMatches: number = 0;
 
   public static main(): void {
     let fileSearch: FileSearch;
@@ -20,7 +21,7 @@ class FileSearch extends DirectoryTemplate {
     fileSearch.run();
   }
 
-  protected static usage(): void {
+  private static usage(): void {
     console.log(`USAGE: npx ts-node src/FileSearch.ts {-r} <dir> <file-pattern> <search-pattern>`);
   }
 
@@ -36,43 +37,11 @@ class FileSearch extends DirectoryTemplate {
 
   private async run() {
     await this.searchDirectory(this.dirName);
-    console.log(`TOTAL: ${this.totalCount}`);
+    console.log();
+    console.log(`TOTAL MATCHES: ${this.totalMatches}`);
   }
 
-  async searchDirectory(filePath: string) {
-    if (!this.isDirectory(filePath)) {
-      this.nonDirectory(filePath);
-      return;
-    }
-
-    if (!this.isReadable(filePath)) {
-      this.unreadableDirectory(filePath);
-      return;
-    }
-    const files = fs.readdirSync(filePath);
-
-    for (let file of files) {
-      const fullPath = path.join(filePath, file);
-      if (this.isFile(fullPath)) {
-        if (this.isReadable(fullPath)) {
-          await this.searchFile(fullPath);
-        } else {
-          this.unreadableFile(fullPath);
-        }
-      }
-    }
-
-    if (this.recurse) {
-      for (let file of files) {
-        const fullPath = path.join(filePath, file);
-        if (this.isDirectory(fullPath)) {
-          await this.searchDirectory(fullPath);
-        }
-      }
-    }
-  }
-
-  private async searchFile(filePath: string) {
+  override async searchFile(filePath: string) {
     let currentCount = 0;
 
     if (this.fileRegExp.test(filePath)) {
@@ -87,7 +56,7 @@ class FileSearch extends DirectoryTemplate {
             }
 
             console.log(line);
-            this.totalCount++;
+            this.totalMatches++;
           }
         });
       } catch (error) {
